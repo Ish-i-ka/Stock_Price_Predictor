@@ -1,0 +1,87 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Prediction</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Import Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Price Prediction</h1>
+        
+        <!-- Form for user input -->
+        <div class="input-container">
+            <label for="open">Open Price</label>
+            <input type="number" id="open" placeholder="Enter Open Price" required>
+            
+            <label for="high">High Price</label>
+            <input type="number" id="high" placeholder="Enter High Price" required>
+            
+            <label for="low">Low Price</label>
+            <input type="number" id="low" placeholder="Enter Low Price" required>
+            
+            <label for="volume">Volume</label>
+            <input type="number" id="volume" placeholder="Enter Volume" required>
+            
+            <!-- Explicitly set the button type to "button" -->
+            <button type="button" id="predict-button">Predict</button>
+        </div>
+        
+        <!-- Area to display result -->
+        <div id="result">
+            <h2>Predicted Closing Price:</h2>
+            <p id="prediction-result">N/A</p>
+        </div>
+    </div>
+    
+    <script>
+        // Function to handle prediction
+        function predictPrice() {
+            // Get input values from the form
+            const open = document.getElementById('open').value;
+            const high = document.getElementById('high').value;
+            const low = document.getElementById('low').value;
+            const volume = document.getElementById('volume').value;
+            
+            // Ensure all fields are filled
+            if (!open || !high || !low || !volume) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            // Validate input values to be numeric
+            if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(volume)) {
+                alert('Please enter valid numeric values for all fields.');
+                return;
+            }
+            
+            // Construct the query parameters
+            const params = {
+                open: parseFloat(open),
+                high: parseFloat(high),
+                low: parseFloat(low),
+                volume: parseInt(volume)
+            };
+            
+            // Axios GET request to the prediction endpoint
+            axios.get('http://127.0.0.1:5000/predict', { params })
+                .then(response => {
+                    // Display the predicted result
+                    const predictedClose = response.data.predicted_close_price;
+                    document.getElementById('prediction-result').innerText = `$${predictedClose.toFixed(2)}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching prediction:', error);
+                    document.getElementById('prediction-result').innerText = 'Error fetching prediction. Please try again.';
+                });
+        }
+        
+        // Attach event listener to the button
+        document.getElementById('predict-button').addEventListener('click', predictPrice);
+    </script>
+</body>
+</html>
